@@ -1,0 +1,23 @@
+install.packages('prophet') #no neeed if installed
+
+# R
+library(prophet)
+df <- read.csv("C:/Users/Documents/py4e/Data forecasting Facebook prophet model/GOOG2.csv")
+
+m <- prophet(df, daily.seasonality = TRUE)
+
+
+future <- make_future_dataframe(m, periods = 365)
+#if you want forecast next 3 years use this code:
+#future <- make_future_dataframe(m, periods = 3, freq="year")
+tail(future)
+
+forecast <- predict(m, future)
+tail(forecast[c('ds', 'yhat', 'yhat_lower', 'yhat_upper')])
+
+
+plot(m, forecast)
+
+prophet_plot_components(m, forecast)
+
+dyplot.prophet(m, forecast)
