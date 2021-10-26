@@ -1,5 +1,6 @@
 
-# This code is in R and about stock price forecasting using Google stock price data between June 8, 2015 and June 10 2020.
+# This project is in R and about stock price forecasting using time-series Google stock price data between June 8, 2015 and June 10 2020.
+# I used Facebook Prophet model.
 
 install.packages('prophet') #no neeed if installed
 
