@@ -1,7 +1,7 @@
 - 👋 Hi, I’m @Nizami13
-- 👀 I’m interested in Data Science, Forecasting
+- 👀 I’m interested in Data Science, ML and AI
 - 🌱 I’m currently learning different forecasting models
-- 💞️ I’m looking to collaborate on timeseries forecasting
+- 💞️ I’m looking to collaborate on different topics related to Data Science
 - 📫 How to reach me: write here please.
 
 <!---
