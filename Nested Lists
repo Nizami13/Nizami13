@@ -1,0 +1,53 @@
+#Given the names and grades for each student in a class of  students, store them in a nested list and print the name(s) of any student(s) having the second lowest grade.
+#Note: If there are multiple students with the second lowest grade, order their names alphabetically and print each name on a new line.
+
+def second_lowests(grades):
+    """
+    returns list of names of students with second lowest score
+    """
+    # intialize the `lowest` and second lowest `slowest` score and names
+    grades = iter(grades)
+    lname, lowest = next(grades)
+    slname, slowest = next(grades)
+    if slowest < lowest:
+        lowest, slowest = slowest, lowest
+        names = [lname]
+    elif slowest == lowest: # we don't know, if lowest can be second lowest!
+        names = [lname, slname]
+    else:
+        names = [slname]
+
+    for name, score in grades:
+        if score == slowest:
+            names.append(name)
+            continue
+        if score == lowest:
+            continue
+        if score < lowest:
+            if slowest == lowest:
+                pass
+            else:
+                names = [lname]
+            lowest, slowest = score, lowest
+            lname = name
+        elif score < slowest:
+            slowest = score
+            names = [name]
+        elif score > slowest and slowest == lowest:
+            slowest = score
+            names = [name]
+
+    if slowest == lowest: # all have same score
+        return []
+    names.sort()
+    return names
+
+
+if __name__ == '__main__':
+    nested_list = []
+    for _ in range(int(raw_input())):
+        name = raw_input()
+        score = float(raw_input())
+        nested_list.append([name, score])
+    assert 2 <= len(nested_list) <= 5
+    print ("\n".join(second_lowests(nested_list)))
