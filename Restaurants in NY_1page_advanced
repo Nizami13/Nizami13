@@ -1,0 +1,186 @@
+
+### Imports
+"""
+
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd 
+import urllib.parse
+
+"""### HTTP Request
+
+#### store website in variable
+"""
+
+website = 'https://www.yellowpages.com/search?search_terms=restaurant&geo_location_terms=New+York%2C+NY'
+
+"""#### Get Request"""
+
+response = requests.get(website)
+
+"""#### Status Code"""
+
+response.status_code
+
+"""### Soup Object """
+
+soup = BeautifulSoup(response.content, 'html.parser')
+
+soup
+
+"""### Results"""
+
+result_container = soup.find_all('div', {'class':'result'})
+
+result_container
+
+len(result_container)
+
+
+
+"""### Concatenate 2 URL Parts to get absolute URL
+
+#### URL Part 1
+"""
+
+# we combine url part no.1 with url part no.2 in order to get the absolute url
+
+url_part_1 = 'https://www.yellowpages.com/'
+
+"""#### Create List for URL Part 2"""
+
+url_part_2 = []
+
+# loop through results
+for item in result_container:
+    # loop through links
+    for link in item.find_all('a', {'class': 'business-name'}):
+        url_part_2.append(link.get('href'))
+
+url_part_2
+
+"""#### Join Url 1 and Url 2"""
+
+url_joined = []
+
+for link_2 in url_part_2:
+    url_joined.append(urllib.parse.urljoin(url_part_1, link_2))
+
+url_joined
+
+"""### Get Data from First Link """
+
+# Name
+# Address
+# Phone
+# Email
+# Website
+# General Info
+
+"""#### Store first link in variable
+
+"""
+
+first_link = url_joined[0]
+
+"""#### Get Request & Soup Object"""
+
+response = requests.get(first_link)
+
+soup = BeautifulSoup(response.content, 'html.parser')
+
+soup
+
+"""#### Name"""
+
+soup.find('h1').get_text()
+
+"""#### Address"""
+
+soup.find('h2', {'class': 'address'}).get_text()
+
+"""#### Phone"""
+
+soup.find('p', {'class':'phone'}).get_text()
+
+"""#### Email"""
+
+# most important part
+
+soup.find('a', {'class': 'email-business'}).get('href').split('mailto:')[1]
+
+"""#### Website"""
+
+soup.find('a', {'class': 'website-link'}).get('href')
+
+"""#### General Info"""
+
+soup.find('dd', {'class': 'general-info'}).get_text()
+
+
+
+"""### Put all together and loop through all pages"""
+
+# empty list - we need it so we can append all results - hand it over to pandas dataframe
+results = []
+
+# loop through all joined links
+for link in url_joined:
+    response = requests.get(link)
+    
+    # create soup object
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    # name
+    try:
+        name = soup.find('h1').get_text()
+    except:
+        name = 'n/a'
+        
+    # address 
+    try:
+        address = soup.find('h2', {'class': 'address'}).get_text()
+    except:
+        address = 'n/a'
+        
+    # phone
+    try:
+        phone = soup.find('p', {'class':'phone'}).get_text()
+    except:
+        phone = 'n/a'
+        
+    # email
+    try:
+        email = soup.find('a', {'class': 'email-business'}).get('href').split('mailto:')[1]
+    except:
+        email = 'n/a'
+        
+    # website
+    try:
+        website = soup.find('a', {'class': 'website-link'}).get('href')
+    except:
+        website = 'n/a'
+        
+    # general info
+    try:
+        info = soup.find('dd', {'class': 'general-info'}).get_text()
+    except:
+        info = 'n/a'
+        
+    
+    # create dictionary with results
+    output = {'Restaurant Name': name, 'Address': address, 'Phone': phone, 'Email': email, 'Homepage':website,
+             'Info':info}
+    
+    # append results in empty list
+    results.append(output)
+
+"""### Create Pandas Dataframe"""
+
+df = pd.DataFrame(results)
+
+df
+
+"""### Store in Excel"""
+
+df.to_excel('result_single_page.xlsx', index=False)
