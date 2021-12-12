@@ -1,0 +1,61 @@
+
+
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+
+website='https://www.propertyfinder.ae/en/search?c=2&l=50&ob=mr&page=1&rp=y'
+
+response=requests.get(website)
+
+response.status_code
+
+soup=BeautifulSoup(response.content,'html.parser')
+
+#card-list__item
+
+#taking ul unordered value and looking at list search results class
+results = soup.find_all('div',{'class':'card-list__item'})
+
+len(results)
+
+results
+
+results[3].find('span', {'class':'card__price-value'}).get_text().strip()
+
+results[5].find('span', {'class':'card__location-text'}).get_text()
+
+results[5].find('p', {'class':'card__property-amenity card__property-amenity--bedrooms'}).get_text().strip()
+
+results[5].find('p', {'class':'card__property-amenity card__property-amenity--bathrooms'}).get_text().strip()
+
+streets= []
+beds= []
+baths= []
+price= []
+
+for result in results:
+  try:
+    streets.append(result.find('span', {'class':'card__location-text'}).get_text())
+  except:
+    streets.append('n/a')
+  try:
+    beds.append(result.find('p', {'class':'card__property-amenity card__property-amenity--bedrooms'}).get_text())
+  except:
+    beds.append('n/a')
+ 
+  try:
+    baths.append(result.find('p', {'class':'card__property-amenity card__property-amenity--bathrooms'}).get_text().strip())
+  except:
+    baths.append('n/a')
+  try:
+    price.append(result.find('span', {'class':'card__price-value'}).get_text().strip())
+  except:
+    price.append('n/a')
+
+baths
+
+#puting all together
+Dubai_Marina_real_estate = pd.DataFrame({'Street':streets, 'Bedroom':beds, 'Bathroom':baths, 'Price':price})
+
+Dubai_Marina_real_estate.to_excel('Dubai_Marina_real_estate_page_1.xlsx',index=False)
