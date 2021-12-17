@@ -1,0 +1,63 @@
+
+
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+
+#Puting all together
+#creating empty dataframe
+real_estate_marina = pd.DataFrame(columns=['Street','Beds', 'Baths', 'Price'])
+
+#scrap 10 pages
+#sequence of numbers 1 up to 7 , bcs 8 is excluded
+for i in range(2,11):
+  #bcs only page number change and we make it string element
+  website= requests.get('https://www.propertyfinder.ae/en/search?c=2&l=50&ob=mr&page=' + str(i) + '&rp=y')
+ 
+  
+  #create soup object
+  soup = BeautifulSoup(website.content, 'html.parser')
+ 
+  #result items
+  results = soup.find_all('div',{'class':'card-list__item'})
+ 
+  #lists
+streets= []
+beds= []
+baths= []
+price= []
+
+for result in results:
+  try:
+    streets.append(result.find('span', {'class':'card__location-text'}).get_text())
+  except:
+    streets.append('n/a')
+  try:
+    beds.append(result.find('p', {'class':'card__property-amenity card__property-amenity--bedrooms'}).get_text())
+  except:
+    beds.append('n/a')
+ 
+  try:
+    baths.append(result.find('p', {'class':'card__property-amenity card__property-amenity--bathrooms'}).get_text().strip())
+  except:
+    baths.append('n/a')
+  try:
+    price.append(result.find('span', {'class':'card__price-value'}).get_text().strip())
+  except:
+    price.append('n/a')
+
+price
+
+for k in range(len('500')):
+    real_estate_marina = real_estate_marina.append({'Street': streets[k], 'Beds': beds[k], 'Baths': baths[k], 'Price': price[k]}, ignore_index=True)
+
+real_estate_marina
+
+#Data cleaning
+#remove bd and ba
+real_estate_marina['Price']=real_estate_marina['Price'].apply(lambda x: x.strip('AED/year'))
+
+#So Updated Data Frame after removing bd and ba will be
+
+
+real_estate_marina.to_excel('real_estate_marina_multiple_pages.xlsx', index=False)
