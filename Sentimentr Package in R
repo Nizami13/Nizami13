@@ -1,0 +1,21 @@
+#Simple Positive or negative analyses of text with sentimentr package in R
+install.packages('sentimentr')
+library(sentimentr)
+some_text <- c('This is a very beautiful day',
+               'I am not feeling good', 'I hate it when it happens',
+               'The product is good, but expensive at this price',
+               'I love you')
+sentiment(some_text)
+#as you can see here in the above results
+#the package divided second under quatiotaion sentence
+#into 2 sentence, but you can make it one with using
+#sentiment_by command
+
+sentiment_by(some_text)
+
+extract_sentiment_terms(some_text)
+
+get_sentences(some_text)
+
+plot(sentiment(some_text))
+
