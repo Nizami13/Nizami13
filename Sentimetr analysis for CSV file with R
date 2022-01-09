@@ -1,0 +1,25 @@
+
+library(NLP)
+library(tm)
+library(RColorBrewer)
+library(wordcloud)
+library(syuzhet)
+library(lubridate)
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+library(sentimentr)
+
+read_data <- read.csv("~/py4e/Sentiment analyses in R/Test2.csv", header = T)
+
+str(read_data)
+
+sentiment_data <- iconv(read_data$x)
+
+sentiment(sentiment_data)
+
+final <- sentiment(sentiment_data)
+
+plot(sentiment(sentiment_data))
+
+write.csv(final, file="C:/Users/iniza/Documents/py4e/Sentiment analyses in R/Sentiment_test2_Final2.csv")
