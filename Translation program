@@ -1,0 +1,9 @@
+###pip install deep-translator
+from deep_translator import GoogleTranslator
+print ("Welcome to translation program")
+b=input("Insert the word: ")
+a=b
+print(GoogleTranslator('auto', 'en').translate(a))
+
+
+#change en (English) to ru (russian) or az(Azerbaijan) or to any other language.
