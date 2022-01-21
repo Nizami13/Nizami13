@@ -1,4 +1,4 @@
-#In this project I first insert data about movies, directors, actors and revenues and then analyze it.
+#In this project I first insert data about movies, directors, actors and revenues and then analyze it. I join tables, create subqueries, split, replace and group data.
 #I do analyses in PostgreSQL
 
 INSERT INTO actors (first_name, last_name, gender, date_of_birth) VALUES ('Malin','Akerman','F','1978-05-12'),
