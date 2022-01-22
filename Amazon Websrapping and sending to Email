@@ -1,3 +1,4 @@
+#In this project I scrapped Apple Ipod price and title and programmed it to collect the price every day and send the email to me if the price is below 730.
 # import libraries 
 
 from bs4 import BeautifulSoup
