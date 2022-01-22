@@ -1,0 +1,131 @@
+# import libraries 
+
+from bs4 import BeautifulSoup
+import requests
+import time
+import datetime
+
+import smtplib
+
+# Connect to Website and pull in data
+
+URL = 'https://www.amazon.ae/Apple-AirPods-MagSafe-charging-case/dp/B09JR9VNSP/ref=sr_1_5?keywords=airpods+pro&qid=1642871016&sprefix=airpo%2Caps%2C299&sr=8-5'
+
+headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36", "Accept-Encoding":"gzip, deflate", "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "DNT":"1","Connection":"close", "Upgrade-Insecure-Requests":"1"}
+
+page = requests.get(URL, headers=headers)
+
+soup1 = BeautifulSoup(page.content, "html.parser")
+
+soup2 = BeautifulSoup(soup1.prettify(), "html.parser")
+
+title = soup2.find(id='productTitle').get_text()
+
+price = soup2.find('span',{'class':'a-offscreen'}).get_text()
+
+
+print(title)
+print(price)
+
+# Clean up the data a little bit
+
+price = price.strip()[3:]
+title = title.strip()
+
+print(title)
+print(price)
+
+# Create a Timestamp for your output to track when data was collected
+
+import datetime
+
+today = datetime.date.today()
+
+print(today)
+
+# Create CSV and write headers and data into the file
+
+import csv 
+
+header = ['Title', 'Price', 'Date']
+data = [title, price, today]
+
+
+#with open('AmazonWebScraperDataset.csv', 'w', newline='', encoding='UTF8') as f:
+    #writer = csv.writer(f)
+    #writer.writerow(header)
+    #writer.writerow(data)
+
+#Combine all of the above code into one function
+
+
+def check_price():
+  URL = 'https://www.amazon.ae/Apple-AirPods-MagSafe-charging-case/dp/B09JR9VNSP/ref=sr_1_5?keywords=airpods+pro&qid=1642871016&sprefix=airpo%2Caps%2C299&sr=8-5'
+  
+  headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36", "Accept-Encoding":"gzip, deflate", "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "DNT":"1","Connection":"close", "Upgrade-Insecure-Requests":"1"}
+  
+  page = requests.get(URL, headers=headers)
+  
+  soup1 = BeautifulSoup(page.content, "html.parser")
+  
+  soup2 = BeautifulSoup(soup1.prettify(), "html.parser")
+
+  title = soup2.find(id='productTitle').get_text()
+  
+  price = soup2.find('span',{'class':'a-offscreen'}).get_text()
+
+  price = price.strip()[3:]
+  
+  title = title.strip()
+
+  import datetime
+  
+  today = datetime.date.today()
+
+  import csv 
+  header = ['Title', 'Price', 'Date']
+  data = [title, price, today]
+
+  with open('AmazonWebScraperDataset.csv', 'a+', newline='', encoding='UTF8') as f:
+        writer = csv.writer(f)
+        writer.writerow(data)
+
+# Runs check_price after a set time and inputs data into your CSV
+#This goes with the second, there are 60 seconds in a minute, 60 min in hour
+#and 24 hours a day 60*60*24=86400
+#This is going to check the price every single day.
+
+
+while(True):
+    check_price()
+    time.sleep(86400)
+
+#if you want to check price every 5 seconds.
+#while(True):
+    #check_price()
+    #time.sleep(5)
+
+# If uou want to try sending yourself an email (just for fun) when a price hits below a certain level you can try it
+# out with this script
+
+def send_mail():
+    server = smtplib.SMTP_SSL('smtp.gmail.com',465)
+    server.ehlo()
+    #server.starttls()
+    server.ehlo()
+    server.login('imamverdiyev25@gmail.com','XXXXX')
+    
+    subject = "The airpod you want to buy is below AED730! Now is your chance to buy!"
+    body = "Nizami, This is the moment we have been waiting for. Now is your chance to pick up the airpod. Don't mess it up! Link here: https://www.amazon.ae/Apple-AirPods-MagSafe-charging-case/dp/B09JR9VNSP/ref=sr_1_5?keywords=airpods+pro&qid=1642871016&sprefix=airpo%2Caps%2C299&sr=8-5"
+   
+    msg = f"Subject: {subject}\n\n{body}"
+    
+    server.sendmail(
+        'imamverdiyev25@gmail.com',
+        msg
+     
+    )
+
+#price = int(price)  int(float(coffee_bags))
+if (int(float(price))) < 730:
+  send_mail()
