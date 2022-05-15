@@ -1,0 +1,95 @@
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd 
+import urllib.parse
+#Put all together
+#create dataframe, in the begining it is empty
+df_cars=pd.DataFrame(columns=['Car name', 'Price', 'Year', 'Reg_year', 'KM', 'color'])
+
+#sequence of numbers from 1 to 3, 4 is not included
+for i in range(1,5):
+  website = 'https://www.lacentrale.fr/listing?energies=elec&makesModelsCommercialNames=&options=&page=' +str(i)
+  response = requests.get(website)
+
+  #create soup object
+  soup=BeautifulSoup(response.content, 'html.parser')
+
+  #result container
+  result_container = soup.find_all('div', {'class':'adLineContainer'})
+
+  #url part 1
+  url_part_1 = 'https://www.lacentrale.fr/'
+
+  url_part_2=[]
+
+  #url part 2
+  for item in result_container:
+    # loop through links
+    for link in item.find_all('a'):
+        url_part_2.append(link.get('href'))
+
+  #join url1 to url2 in order to get absolute url
+  url_joined = []
+  
+  for link_2 in url_part_2:
+    url_joined.append(urllib.parse.urljoin(url_part_1, link_2))
+
+  # loop through all joined links
+  for link in url_joined:
+    response = requests.get(link)
+
+     # create soup object
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    # name
+    try:
+        name = soup.find('h1').get_text()
+    except:
+        name = 'n/a'
+
+    # price
+    try:
+        price = soup.find('span', {'class':'cbm__priceWrapper'}).get_text().strip()[:6]
+    except:
+        price = 'n/a'
+
+    # year
+
+    try:
+        year = soup.select_one('.optionLabel:-soup-contains("Année") + span').get_text()
+    except:
+        year = 'n/a'
+
+    # Reg_year
+
+    try:
+        reg_year = soup.select_one('.optionLabel:-soup-contains("Mise en circulation") + span').get_text()
+    except:
+        reg_year = 'n/a'
+
+
+    # KM
+
+    try:
+        km = soup.select_one('.optionLabel:-soup-contains("Kilométrage compteur") + span').get_text()
+    except:
+        km = 'n/a'
+
+
+    # color
+
+    try:
+        color = soup.select_one('.optionLabel:-soup-contains("Couleur extérieure") + span').get_text()
+    except:
+        color = 'n/a'
+
+
+ #Pandas dataframe
+    df_cars=df_cars.append({'Car name':name, 'Price':price, 'Year':year,'Reg_year':reg_year, 'KM':km, 'color':color}, ignore_index=True)
+
+    
+  #Output
+df_cars
+
+#store in Excel
+df_cars.to_excel('results_cars_pages_electric.xlsx', index=False)
